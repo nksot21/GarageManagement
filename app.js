@@ -59,11 +59,11 @@ User.init({
   birthday: DataTypes.DATE
 }, { sequelize, modelName: 'user' });*/
 
-app.use("/user", userRoute)
-app.use("/khachhang", khachHangRoute)
-app.use("/car", carRoute )
-app.use("/cartype", carTypeRoute)
-//app.use("/", authen, siteRoute)
+//app.use("/user", userRoute)
+//app.use("/khachhang", khachHangRoute)
+//app.use("/car", carRoute )
+//app.use("/cartype", carTypeRoute)
+app.use("/", authen, siteRoute)
 
 
 
