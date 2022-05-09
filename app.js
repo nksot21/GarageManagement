@@ -8,9 +8,6 @@ const userRoute = require('./src/routes/user')
 const { Sequelize, Model, DataTypes } = require('sequelize');
 const authen = require('./src/pkg/middleware/authen')
 const sequelize = require('./src/pkg/database/sequelize')
-const khachHangRoute = require('./src/routes/KhachHang')
-const carRoute = require('./src/routes/Car')
-const carTypeRoute = require('./src/routes/HieuXe')
 
 //SET UP BODY-PARSER
 app.use(bodyParser.urlencoded({ extended: false }));
