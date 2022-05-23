@@ -24,19 +24,19 @@ const saltRounds = 10;
 const userController = {
     createUser: async (req, res, next) => {
         try{
-            var userReq = new User({
+            var userReq = {
                 username: req.body.username,
                 email: req.body.email,
                 password: req.body.password
-            });
+            };
             //var user =  isUserExisted(userReq.email)
 
             if( !userReq.username || !userReq.email || !userReq.password){
-                req.json("fill in username or email or password")
+                res.json("fill in username or email or password")
             }
 
             //CHECK USER EXIST
-            var user = await User.findOne({where:{email:userReq.email}})
+            var user = await User.findOne({where:{Email:userReq.email}})
             if (user){
                 res.json("Email existed")
                 return
@@ -47,9 +47,9 @@ const userController = {
                     res.json("bcypt err")
                 }
                 var newUser = await User.create({
-                    username: userReq.username,
-                    email: userReq.email,
-                    password: hash
+                    Username: userReq.username,
+                    Email: userReq.email,
+                    Password: hash
                 })
                 res.json(newUser.toJSON())
             })

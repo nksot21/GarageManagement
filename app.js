@@ -5,6 +5,8 @@ const mysql = require('mysql2')
 const sequelizeCon = require('./src/pkg/database/mySQLConnection')
 const siteRoute = require('./src/routes/site')
 const userRoute = require('./src/routes/user')
+const collectmoneyRoute = require('./src/routes/collectmoney')
+const searchcarRoute = require('./src/routes/searchcar')
 const { Sequelize, Model, DataTypes } = require('sequelize');
 const authen = require('./src/pkg/middleware/authen')
 const sequelize = require('./src/pkg/database/sequelize')
@@ -59,10 +61,12 @@ User.init({
   birthday: DataTypes.DATE
 }, { sequelize, modelName: 'user' });*/
 
-//app.use("/user", userRoute)
+app.use("/user", userRoute)
 //app.use("/khachhang", khachHangRoute)
 //app.use("/car", carRoute )
 //app.use("/cartype", carTypeRoute)
+app.use("/search",searchcarRoute)
+app.use("/collectmoney",collectmoneyRoute)
 app.use("/", authen, siteRoute)
 
 
