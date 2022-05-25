@@ -6,6 +6,46 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const collectmoneyController =
 {
+    find_collectmoney: async (req,res,next)=>
+    {
+        try
+        {
+            let userReq={
+                bienso: req.body.bienso,
+            }
+            if (!userReq.bienso)
+            {
+                let allReceipts = await Receipts.findAll({raw: true, nest: true})
+                let prcReceipts = allReceipts.map(receipt=>
+                    {
+                        delete receipt["createdAt"]
+                        delete receipt["updatedAt"]
+                        return receipt
+                    })
+                res.json(prcReceipts)
+                return
+            }
+            else{
+                let allCar= await Car.findOne({
+                    where: {LicensePlate: userReq.bienso}})
+                let allReceipts=await Receipts.findAll({
+                    where: {CarID: allCar["id"]},raw: true, nest: true})
+                let procReceipts = allReceipts.map(receipt=>{
+                    delete receipt["createdAt"]
+                    delete receipt["updatedAt"]
+                    return receipt
+                })
+                res.json(procReceipts)
+                return
+            }
+
+        }
+        catch(err)
+        {
+            res.json(err)
+        }
+
+    },
     collectmoney: async (req, res, next) => {
         try {
             let userReq = {
