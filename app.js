@@ -44,9 +44,6 @@ sequelizeCon.connection.isConnect();
 sequelizeCon.connection.migration();
 
 app.use("/user", userRoute)
-app.use("/khachhang", khachHangRoute)
-app.use("/car", carRoute )
-app.use("/cartype", carTypeRoute)
 app.use("/carReceive", carReceiveRoute )
 app.use("/repair", repairInfoSheet)
 app.use("/brand", brandRoute)
