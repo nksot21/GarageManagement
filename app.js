@@ -63,6 +63,7 @@ app.use("/admin", dbAdminPermissionMiddleWare, databaseAdminRoute)
 app.use("/params",paramsRoute)
 app.use("/", authen, siteRoute)
 
-app.listen(3000, () => {
+
+app.listen(process.env.PORT, () => {
     console.log("hello")
 })
