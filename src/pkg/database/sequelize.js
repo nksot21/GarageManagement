@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 
 const sequelize= new Sequelize('qltt', 'root', null, {
-    host: 'localhost',
+    host: 'https://gara-management-nmcnpm.herokuapp.com/',
     dialect: 'mysql',
     define:{
       freezeTableName: true
