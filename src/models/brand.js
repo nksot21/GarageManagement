@@ -6,7 +6,7 @@ class brand extends Model{}
 
 // HIỆU XE
 brand.init({
-    name: DataTypes.TEXT
+    Name: DataTypes.TEXT
 },{
     sequelize,
     modelName: 'BRAND'

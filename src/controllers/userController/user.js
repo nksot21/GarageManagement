@@ -1,5 +1,5 @@
 const { user, password } = require('pg/lib/defaults');
-const User = require('../models/user');
+const User = require('../../models/user');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
@@ -24,37 +24,36 @@ const saltRounds = 10;
 const userController = {
     createUser: async (req, res, next) => {
         try{
-            var userReq = new User({
+            var userReq = {
                 username: req.body.username,
                 email: req.body.email,
                 password: req.body.password
-            });
+            }
             //var user =  isUserExisted(userReq.email)
 
             if( !userReq.username || !userReq.email || !userReq.password){
-                req.json("fill in username or email or password")
+                return res.json("fill in username or email or password")
             }
 
             //CHECK USER EXIST
-            var user = await User.findOne({where:{email:userReq.email}})
+            var user = await User.findOne({where:{Email:userReq.email}})
             if (user){
-                res.json("Email existed")
-                return
+                return res.json("Email existed")
             }
 
             bcrypt.hash(userReq.password, saltRounds, async function(err, hash){
                 if (err){
-                    res.json("bcypt err")
+                    return res.json("bcypt err")
                 }
-                var newUser = await User.create({
-                    username: userReq.username,
-                    email: userReq.email,
-                    password: hash
+                let newUser = await User.create({
+                    Username: userReq.username,
+                    Email: userReq.email,
+                    Password: hash
                 })
-                res.json(newUser.toJSON())
+                return res.status(200).json(newUser.toJSON())
             })
         }catch(err){
-            console.log(err)
+            return res.status(400).json(err)
         }
     },
     signin: async (req, res, next) => {
@@ -65,29 +64,27 @@ const userController = {
             }
 
             if (!signInInfo.email || !signInInfo.password){
-                res.json("fill in email or password")
+                return res.status(400).json("fill in email or password")
             }
 
             // FIND USER BY EMAIL
-            var userDB = await User.findOne({where:{email:signInInfo.email}})
+            var userDB = await User.findOne({where:{Email:signInInfo.email}})
             if (!userDB){
-                res.json("User does not existed")
-                return
+                return res.status(400).json("User does not existed")
             }
 
-            bcrypt.compare(signInInfo.password, userDB.password)
+            bcrypt.compare(signInInfo.password, userDB.Password)
             .then(function(result){
                 if(!result){
-                    res.json("wrong password")
-                    return
+                    return res.status(400).json("wrong password")
                 }else{
                     console.log(process.env.PRIVATE_KEY)
                     const token = jwt.sign(
-                      {email: userDB.email, username: userDB.username},
+                      {email: userDB.Email, password: userDB.Password},
                       process.env.PRIVATE_KEY,
                       {expiresIn: "1h"}
                     )
-                    res.status(200).json({
+                    return res.status(200).json({
                         message: "You are in",
                         UserInfo:{
                             username: userDB.username,
@@ -98,15 +95,15 @@ const userController = {
                 }
             })
         }catch(err){
-            res.json(err)
+            return res.status(400).json(err)
         }
     },
     getUsers: async (req, res, next) => {
         try{
             var users = await User.findAll()
-            res.json(users)
+            return res.status(200).json(users)
         }catch(err) {
-            console.log(err)
+            return res.status(400).json(err)
         }
     },
 
@@ -114,34 +111,18 @@ const userController = {
         try{
             var usernameReq = req.body.username
             if (!usernameReq){
-                res.json("fill in username")
+                return res.status(400).json("fill in username")
             }
-            var users = await User.findAll({where:{username: usernameReq}})
-            if (users === null){
-                console.log("User not found!")
-            }else{
-                console.log("kore")
-                res.json(users)
-            }
+            var users = await User.findAll({where:{Username: usernameReq}})
+            if (!users)
+               return res.status(400).json("user not found")
+
+            return res.status(200).json(users)
         }
         catch(err){
-            res.json("error")
+            return res.status(400).json("error")
         }
     }
 }
-
-/*async function create(){
-    try{
-        await sequelize.sync();
-         const jane = await User.create({
-      username: 'janedoe',
-      birthday: new Date(1980, 6, 20)
-    });
-    console.log(jane.toJSON());
-    }catch{
-        console.log("error")
-    }
-};
-create();*/
 
 module.exports = userController

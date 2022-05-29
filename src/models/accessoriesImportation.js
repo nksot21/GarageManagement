@@ -5,7 +5,10 @@ class accessoriesImportation extends Model{}
 
 // PHIẾU NHẬP VẬT TƯ PHỤ TÙNG
 accessoriesImportation.init({
-    TotalAmount: DataTypes.INTEGER,
+    TotalAmount: {
+        type: DataTypes.DATE,
+        defaultValue: 0
+    },
     Date: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW

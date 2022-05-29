@@ -5,13 +5,32 @@ class inventoryReport extends Model{}
 
 // BÁO CÁO TỒN
 inventoryReport.init({
-    Date: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+    Month: {
+        type: DataTypes.INTEGER
     },
-    InitialQuantity: DataTypes.INTEGER,
-    Arising: DataTypes.INTEGER,
-    FinalQuantity: DataTypes.INTEGER
+    Year: {
+        type: DataTypes.INTEGER
+    },
+    InitialQuantity: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    Arising: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    UsedQuantity: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    ImportedQuantity: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    FinalQuantity: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    }
 },{
     sequelize,
     modelName: 'INVENTORYREPORT'

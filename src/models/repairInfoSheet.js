@@ -5,11 +5,18 @@ class repairInfoSheet extends Model{}
 
 // PHIẾU SỮA CHỮA
 repairInfoSheet.init({
-    Amount: DataTypes.INTEGER, // thành tiền
-    Date: DataTypes.DATE // ngày lập phiếu
+    Amount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    Date: {
+        type : DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+    } // ngày lập phiếu
 },{
     sequelize,
-    modelName: 'REPAIRINFOSHEET'
+    modelName: 'REPAIRINFOSHEET',
+    paranoid: true
 });
 
 module.exports = repairInfoSheet

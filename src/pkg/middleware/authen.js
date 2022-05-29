@@ -8,7 +8,6 @@ const authen = (req, res, next) => {
                 req.headers.authorization,
                 process.env.PRIVATE_KEY
             );
-            req.id = decoded.id;
             console.log("authen")
             next()
         }

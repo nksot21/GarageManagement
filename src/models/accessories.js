@@ -7,7 +7,10 @@ class accessories extends Model{}
 accessories.init({
     Name: DataTypes.TEXT,
     UnitPrice: DataTypes.INTEGER,
-    Quantity: DataTypes.INTEGER
+    Quantity: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    }
 },{
     sequelize,
     modelName: 'ACCESSORIES'

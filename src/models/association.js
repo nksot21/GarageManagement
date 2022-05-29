@@ -14,6 +14,8 @@ const customer = require('./customer');
 const inventoryReport = require('./inventoryReport');
 const detailedSalesReport = require('./detailedSalesReport');
 const salesReport = require('./salesReport');
+const carReceiveSheet = require('./carReceiveSheet');
+const car = require('./car');
 
 const association = () => {
     //  CAR - CUSTOMER
@@ -92,7 +94,7 @@ const association = () => {
     // ACCESSORIES_DETAIL - REPAIRINFOSHEET_DETAIL
     detailedRepairInfoSheet.hasMany(detailedAccessories, {
         as: 'detailedRepairInfoSheet',
-        foreignKey: 'detailedRepairInfoSheet'
+        foreignKey: 'detailedRepairInfoSheetID'
     })
     detailedAccessories.detailedRepairInfoSheet = detailedAccessories.belongsTo(detailedRepairInfoSheet, {
         foreignKey: 'detailedRepairInfoSheetID'
@@ -151,6 +153,24 @@ const association = () => {
     detailedSalesReport.brand = detailedSalesReport.belongsTo(brand,{
         foreignKey: 'BrandID'
     })
+
+    // CAR_RECEIVE_SHEET - CUSTOMER
+    customer.hasMany(carReceiveSheet,{
+        foreignKey: 'CustomerID'
+    })
+    carReceiveSheet.belongsTo(customer,{
+        foreignKey: 'CustomerID'
+    })
+
+    // CAR_RECEIVE_SHEET - CAR
+    car.hasMany(carReceiveSheet, {
+        foreignKey: 'CarID'
+    })
+    carReceiveSheet.belongsTo(car, {
+        foreignKey: 'CarID'
+    })
+
+
 
 }
 module.exports = association

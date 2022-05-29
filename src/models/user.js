@@ -17,6 +17,10 @@ const sequelize = require('../pkg/database/sequelize')
   cash: DataTypes.INTEGER
 });*/
 
+// 0. DB Admin
+// 1. Manage
+// 2. User
+
 class User extends Model {}
 
 User.init({
@@ -26,11 +30,14 @@ User.init({
       primaryKey: true
     },*/
     Username: DataTypes.STRING,
-    Email: DataTypes.TEXT,
+    Email: {
+      type: DataTypes.TEXT,
+      unique: true
+    },
     Password: DataTypes.TEXT,
     Permission: {
       type: DataTypes.INTEGER,
-      defaultValue: 1
+      defaultValue: 2
     }
   }, {sequelize, modelName: 'USER' });
 

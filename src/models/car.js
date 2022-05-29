@@ -6,12 +6,18 @@ class car extends Model { }
 
 // XE
 car.init({
-    LicensePlate: DataTypes.TEXT, // biển số
+    LicensePlate: {
+        type: DataTypes.TEXT,
+        unique: true
+    }, // biển số
     ReceivedDate: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
     },
-    Debt: DataTypes.INTEGER
+    Debt: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    }
 }, {
     sequelize,
     modelName: 'CAR',

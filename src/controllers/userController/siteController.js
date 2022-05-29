@@ -1,6 +1,6 @@
 const siteController ={
     getHome: (req, res, next) => {
-        res.json("page")
+        return res.json("page")
     }
 }
 

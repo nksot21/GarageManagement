@@ -10,7 +10,8 @@ detailedAccessories.init({
     TotalAmount: DataTypes.INTEGER
 },{
     sequelize,
-    modelName: 'ACCESSORIES_DETAIL'
+    modelName: 'ACCESSORIES_DETAIL',
+    paranoid: true
 });
 
 module.exports = detailedAccessories

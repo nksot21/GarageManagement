@@ -2,6 +2,7 @@ const mysql = require('mysql2');
 const { Sequelize } = require('sequelize');
 const sequelize = require('./sequelize')
 const association = require('../../models/association')
+const parameterModel = require('../../models/parameters')
 
 /*const connection = mysql.createConnection({
     host: "localhost",
@@ -42,8 +43,7 @@ var database = {
         migration: async () => {
             try{
                 association();
-                await sequelize.sync({force:true})
-                
+                await sequelize.sync({force:false})
 
             }catch(err){
                 console.log(err)

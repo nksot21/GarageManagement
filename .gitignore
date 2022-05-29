@@ -10,3 +10,5 @@ src/routes/KhachHang.js
 node_modules
 
 .env
+
+./server.js
