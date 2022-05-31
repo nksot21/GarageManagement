@@ -7,6 +7,7 @@ const siteRoute = require('./src/routes/site')
 const userRoute = require('./src/routes/user')
 const collectmoneyRoute = require('./src/routes/collectmoney')
 const searchcarRoute = require('./src/routes/searchcar')
+const accessoriesimportationRoute=require('./src/routes/accessoriesimportation')
 const { Sequelize, Model, DataTypes } = require('sequelize');
 const authen = require('./src/pkg/middleware/authen')
 const sequelize = require('./src/pkg/database/sequelize')
@@ -67,6 +68,7 @@ app.use("/user", userRoute)
 //app.use("/cartype", carTypeRoute)
 app.use("/search",searchcarRoute)
 app.use("/collectmoney",collectmoneyRoute)
+app.use("/accessoriesimportation",accessoriesimportationRoute)
 app.use("/", authen, siteRoute)
 
 
