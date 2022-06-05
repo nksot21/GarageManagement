@@ -82,11 +82,30 @@ const inventoryReportController = {
             // tính tổng số lượng đã sử dụng
             // tính tổng số lượng đã nhập trong tháng
             // số phát sinh
+
+            if(!inventoryReportReq.month || !inventoryReportReq.year || !inventoryReportReq.initialQuantity){
+                return res.status(400).json("dataError")
+            }
+            //CHECK EXISTED
+            const reportDB = await inventoryReport.findOne({
+                where:{
+                    Month: inventoryReportReq.month,
+                    Year: inventoryReportReq.year
+                }
+            })
+            if(reportDB){
+                return res.status(400).json("existed")
+            }
+
+
+            //CREATE
             let usedQuantity = await getArisingQuantity(inventoryReportReq.month, inventoryReportReq.year)
- 
+            
+            let Name = []
             let createValues = usedQuantity.map((value, i) => {
                 let arisingQuantity = value.TotalImportedQuantity - value.TotalUsedQuantity
-                let finalQuantity = inventoryReportReq.initialQuantity[i] + arisingQuantity
+                let finalQuantity = Number(inventoryReportReq.initialQuantity[i]) + Number(arisingQuantity)
+                Name.push(value.Accessories)
                 return {
                     Month: inventoryReportReq.month,
                     Year: inventoryReportReq.year,
@@ -99,7 +118,10 @@ const inventoryReportController = {
                 }
             })
             let newReport = await inventoryReport.bulkCreate(createValues)
-            return res.status(200).json(newReport)
+            return res.status(200).json({
+                Name: Name,
+                Reports: createValues
+            })
         }catch(err){
             return res.status(400).json(err)
         }

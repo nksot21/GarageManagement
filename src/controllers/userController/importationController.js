@@ -14,30 +14,45 @@ const importationController = {
 
             const newImportation = await importation.create()
             const importationID = newImportation.id
-
+            
+            let detailRes = []
+            let names = []
             await Promise.all(importationReq.accessories.map(async accessory => {
-                try{
+                try{    
+                    // CHECK DATA
+                    if(!accessory.name || !accessory.quantity || !accessory.unitPrice){
+                        return res.status(400).json("dataError")
+                    }
                     // CREATE IMPORTATION DETAIL
-                const amount = accessory.quantity * accessory.unitPrice
+                const amount = Number(accessory.quantity) * Number(accessory.unitPrice)
+                    //GET ACCESSORIESID
+                let accessoriesDB = await accessories.findOne({
+                    where:{Name: accessory.name},
+                    attributes:["id", "Name"]
+                })
+                
                 const newImportationDetail = await importationDetail.create({
-                    AccessoriesID: accessory.accessoriesID,
-                    Quantity: accessory.quantity,
-                    UnitPrice: accessory.unitPrice,
+                    AccessoriesID: accessoriesDB.id,
+                    Quantity: Number(accessory.quantity),
+                    UnitPrice: Number(accessory.unitPrice),
                     AccessoriesImportationID: importationID,
                     Amount: amount
                 })
+                detailRes.push(newImportationDetail)
+                names.push(accessoriesDB.Name)
 
                 // UPDATE ACCESSORIES.QUANTITY
-                const accessoriesDB = await accessories.findByPk(accessory.accessoriesID,{
-                    attributes: ["id"]
-                })
-                await accessoriesDB.increment("Quantity", {by: accessory.quantity})
+                await accessoriesDB.increment("Quantity", {by: Number(accessory.quantity)})
                 }catch(err){
                     return res.status(400).json(err)
                 }
             }))
 
-            return res.status(200).json("inserted")
+            return res.status(200).json({
+                Importation: newImportation,
+                Detail: detailRes,
+                AccessoriesName: names
+            })
 
         }catch(err){
             return res.status(400).json(err)

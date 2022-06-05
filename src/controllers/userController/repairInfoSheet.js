@@ -25,18 +25,27 @@ const repairInfoSheetController = {
     create: async (req, res, next) => {
         try{
             const repairInfoReq = {
-                carID: req.body.carID,
+                licensePlate: req.body.licensePlate,
                 date: req.body.date, 
                 content: req.body.content, // array
                 // mang cac object {"accessoriesID" + "quantity" + "unitPrice"}
                 accessories: req.body.accessories, // array
-                wageID: req.body.wageID, // array
+                wage: req.body.wage, // array
                 times: req.body.times // array
+            }
+
+            console.log(repairInfoReq)
+            //FIND CAR
+            const carDB = await car.findOne({
+                where: {LicensePlate: repairInfoReq.licensePlate}
+            })
+            if(!carDB){
+                return res.status(400).json({Error: 1})
             }
 
             // CREATE REPAIR INFO SHEET
             const newRepair = await repairInfoSheet.create({
-                CarID: repairInfoReq.carID,
+                CarID: carDB.id,
             })
 
             const newRepairID = newRepair.id
@@ -45,7 +54,10 @@ const repairInfoSheetController = {
             let updateRepairAmount = 0
             for(let i=0; i<repairInfoReq.accessories.length; i++){
 
-                let accessoriesDB = await accessories.findByPk(repairInfoReq.accessories[i].id)
+                console.log(repairInfoReq.accessories[i].name)
+                let accessoriesDB = await accessories.findOne(
+                    { where: {Name: repairInfoReq.accessories[i].name}}
+                )
                 // CHECK VALID QUANTITY
                 let newQuantity = accessoriesDB.Quantity - repairInfoReq.accessories[i].quantity
                 if(newQuantity < 0){
@@ -54,6 +66,11 @@ const repairInfoSheetController = {
                 // UPDATE QUANTITY IN ACCESSORIES.
                 await accessoriesDB.update({Quantity: newQuantity })
 
+                //GET WAGE
+                const wageDB = await wage.findOne({
+                    where:{Name: repairInfoReq.wage},
+                    attributes:["id"]
+                })
 
                 // CREATE ACCESSORIES_DETAIL (QUANTITY)
                 console.log("hellooooooooooooooooooooo", newRepairID)
@@ -62,19 +79,18 @@ const repairInfoSheetController = {
                     Content: repairInfoReq.content[i],
                     //WageID: repairInfoReq.wageID[i],
                     Times: repairInfoReq.times[i],
-                    WageID: repairInfoReq.wageID[i]
+                    WageID: wageDB.id
                 })
 
                 // UNITPRICE
-                const unitPrice = await accessories.findByPk(repairInfoReq.accessories[i].id, {
+                const unitPrice = await accessories.findByPk(accessoriesDB.id, {
                     attributes: ["UnitPrice"]
                 })
 
                 console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiii", newRepairDetail.id)
                 // CREATE ACCESSORIES DETAIL
                 // get UnitPrice from Accessories
-                console.log("accessoriesID: ", repairInfoReq.accessories[i].id )
-                let accessoryTotalAmount = repairInfoReq.accessories[i].quantity * unitPrice.UnitPrice
+                let accessoryTotalAmount = Number(repairInfoReq.accessories[i].quantity) * unitPrice.UnitPrice
                 let newAccessoriesDetail = await accessoriesDetail.create({
                     detailedRepairInfoSheetID: newRepairDetail.id,
                     AccessoriesID: repairInfoReq.accessories[i].id,
@@ -84,7 +100,7 @@ const repairInfoSheetController = {
                 })
 
                 // UPDATE REPAIRINFOSHEET_DETAIL
-                const wageValue = await wage.findByPk(repairInfoReq.wageID[i], {
+                const wageValue = await wage.findByPk(wageDB.id, {
                     attributes: ["Value"]
                 })
 
@@ -106,11 +122,11 @@ const repairInfoSheetController = {
             })
 
             // UPDATE CAR.DEBT+= UPDATEREPAIRAMOUNT
-            const carDB = await car.findByPk(repairInfoReq.carID)
             console.log("Car Debt: ", carDB)
             await carDB.increment("Debt", {by: updateRepairAmount})
 
-            return res.status(200).json("inserted")
+            return res.status(200).json({
+            })
         }catch(err){
             console.log("err ", err )
             return res.status(400).json(err)

@@ -38,6 +38,14 @@ User.init({
     Permission: {
       type: DataTypes.INTEGER,
       defaultValue: 2
+    },
+    Address:{
+      type: DataTypes.TEXT,
+      defaultValue: ""
+    }, 
+    PhoneNumber:{
+      type: DataTypes.TEXT,
+      defaultValue: ""
     }
   }, {sequelize, modelName: 'USER' });
 

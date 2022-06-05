@@ -9,10 +9,10 @@ const accessoriesController = {
                 unitPrice: req.body.unitPrice,
                 typeID: req.body.typeID
             }
-            if(!accessoriesReq.name || !accessoriesReq.unitPrice || !accessoriesReq.typeID){
+            if(!accessoriesReq.name || !accessoriesReq.unitPrice){
                 return res.status(400).json("Enter name or unit price or type")
             }
-            const newAccessories = accessories.create({
+            const newAccessories = await accessories.create({
                 Name: accessoriesReq.name,
                 UnitPrice: accessoriesReq.unitPrice,
                 AccessoriesTypeID: accessoriesReq.typeID

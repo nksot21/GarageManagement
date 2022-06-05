@@ -2,6 +2,9 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const mysql = require('mysql2')
+const cors = require('cors')
+
+app.use(cors())
 
 // REQUIRE DATABASE CONNECTION
 const sequelizeCon = require('./src/pkg/database/mySQLConnection')
@@ -25,6 +28,7 @@ const salesReportRoute = require('./src/routes/salesReportRoute')
 const inventoryReportRoute = require('./src/routes/inventoryReportRoute')
 const collectmoneyRoute = require('./src/routes/collectMoneyRoute')
 const searchCarRoute = require('./src/routes/searchCarRoute')
+const carRoute = require('./src/routes/carRoute')
 
 // REQUIRE MIDDLEWARE
 const dbAdminPermissionMiddleWare = require('./src/pkg/middleware/databaseAdmin')
@@ -55,12 +59,13 @@ app.use("/salesreport", salesReportRoute)
 app.use("/inventory", inventoryReportRoute)
 app.use("/seachcar", searchCarRoute)
 app.use("/moneycollection", collectmoneyRoute)
+app.use("/car", carRoute)
 app.use("/admin", dbAdminPermissionMiddleWare, databaseAdminRoute)
 //managePermissionMiddleWare
 app.use("/params",paramsRoute)
 app.use("/", authen, siteRoute)
 
 
-app.listen(process.env.PORT, () => {
+app.listen(3000, () => {
     console.log("hello")
 })

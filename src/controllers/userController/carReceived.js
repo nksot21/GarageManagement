@@ -4,7 +4,7 @@ const carReceiveSheet = require('../../models/carReceiveSheet')
 const parameters = require('../../models/parameters')
 const parameter = require('../../models/parameters')
 const sequelize = require('../../pkg/database/sequelize')
-const { contentDisposition } = require('express/lib/utils')
+const brand = require('../../models/brand')
 
 // PHIEU TIEP NHAN SUA CHUA
 // BM 1
@@ -53,8 +53,6 @@ findCarByLP = async (licensePlate) =>{
 
 // CHECK CARRECEIVED PER DAY
 checkCarReceivedNumber = async () => {
-    const op = sequelize.op
-    const today = new Date();
     const { count, rows } = await car.findAndCountAll({
         where: sequelize.where(sequelize.fn('date', sequelize.col('createdAt')), '=', sequelize.fn('date', sequelize.fn('NOW')))
     })
@@ -71,15 +69,17 @@ checkCarReceivedNumber = async () => {
 }
 
 
+
+
 const carReceiveSheetController = {
     create: async (req, res, next) => {
         // tạo một phiếu tiếp nhận (ID, CustomerID, CarID, ngày tiếp nhận)
         // CHECK THE NIUMBER OF CARS RECEIVED N DAY (30 get from THAMSO_TABLE =)))) 
         try{
             if(! await checkCarReceivedNumber()){
-                return res.status(400).json("exceed the allowed amount")
+                return res.status(400).json({Error: 1})
             }
-            const carReceiveReq = {
+            let carReceiveReq = {
                 customerName: req.body.customerName,
                 customerAddress: req.body.customerAddress,
                 customerPhoneNumber: req.body.customerPhoneNumber,
@@ -87,6 +87,15 @@ const carReceiveSheetController = {
                 licensePlate: req.body.licensePlate,
                 brand: req.body.brand
             }
+
+            const brandName= carReceiveReq.brand
+
+            const carBrand = await brand.findOne({
+                where:{Name: carReceiveReq.brand}
+            })
+
+            carReceiveReq.brand = carBrand.id
+            
 
             console.log(carReceiveReq)
             // FIND CUSTOMER
@@ -118,21 +127,14 @@ const carReceiveSheetController = {
                     return res.status(200).json({
                         ReceiveSheet: newCarReceiveSheet,
                         Customer: newCustomer,
-                        Car: newCar
+                        Car: newCar,
+                        BrandName: brandName
                     })
                 }else{
                     // CREATE NEW CAR RECEIVE SHEET
-                    let newCarReceiveSheet = await carReceiveSheet.create({
-                        CustomerID: newCustomer.id,
-                        CarID: carDB.id,
-                        receivedDate: carReceiveReq.receivedDate
-                    })
                     
-                    return res.status(200).json({
-                        ReceiveSheet: newCarReceiveSheet,
-                        Customer: newCustomer,
-                        Car: carDB
-                    })
+                    //return res.redirect("http://localhost:3000/carreceive")
+                    return res.status(400).json("Car existed")
                 }
                 
             }else{
@@ -155,22 +157,12 @@ const carReceiveSheetController = {
                     return res.status(200).json({
                         ReceiveSheet: newCarReceiveSheet,
                         Customer: customerDB,
-                        Car: newCar
+                        Car: newCar,
+                        BrandName: brandName
                     })
 
                 }else{
-                    // CREATE NEW CAR RECEIVE SHEET
-                    let newCarReceiveSheet = await carReceiveSheet.create({
-                        CustomerID: customerDB.id,
-                        CarID: carDB.id,
-                        receivedDate: carReceiveReq.receivedDate
-                    })
-                    
-                    return res.status(200).json({
-                        ReceiveSheet: newCarReceiveSheet,
-                        Customer: customerDB,
-                        Car: carDB
-                    })
+                    return res.status(400).json("Car existed")
                 }
             }
         }catch(err){
@@ -236,6 +228,23 @@ const carReceiveSheetController = {
             }
             await carReceiveSheet.destroy({where:{id: idReq}})
             return res.status(200).json("deleted")
+        }catch(err){
+            return res.status(400).json(err)
+        }
+    },
+
+    getCarReceivedNumber: async (req, res, next) => {
+        try{
+            const { count, rows } = await car.findAndCountAll({
+                where: sequelize.where(sequelize.fn('date', sequelize.col('createdAt')), '=', sequelize.fn('date', sequelize.fn('NOW')))
+            })
+            const limitNumber = await parameters.findOne({
+                order: [['createdAt', 'DESC']]
+            })
+            return res.status(200).json({
+                Received: count,
+                Max: limitNumber
+            })
         }catch(err){
             return res.status(400).json(err)
         }

@@ -5,6 +5,7 @@ const carReceiveController = require('../controllers/userController/carReceived'
 
 route.post('/', carReceiveController.create)
 route.get('/', carReceiveController.getAll)
+route.get('/number', carReceiveController.getCarReceivedNumber)
 route.get('/:customerID', carReceiveController.getByCustomerPN)
 route.put('/:id', carReceiveController.update)
 route.delete('/:id', carReceiveController.delete)

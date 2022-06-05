@@ -1,8 +1,37 @@
 const Car = require('../../models/car')
 const Receipts = require('../../models/receipts')
 const Customer=require('../../models/customer')
+const { sequelize } = require('../../models/car')
 const collectmoneyController =
 {
+    getAll: async (req, res, next) =>{
+        try{
+            const {count, rows} = await Receipts.findAndCountAll({
+                attributes:["Date", "Amount", "CarID"],
+                include: [{
+                    model: Car,
+                    attributes: ["LicensePlate"],
+                    where:{
+                        id: sequelize.col('RECEIPTS.CarID')
+                    },
+                    include:{
+                        model: Customer,
+                        attributes: ["Name"],
+                        where:{
+                            id: sequelize.col('CAR.CustomerID')
+                        }
+                    }
+                }]
+            })
+
+            return res.status(200).json({
+                Total: count,
+                Receipts: rows
+            })
+        }catch(err){
+            return res.status(400).json(err)
+        }
+    },
     find_collectmoney: async (req,res,next)=>
     {
         try
@@ -10,32 +39,38 @@ const collectmoneyController =
             let userReq={
                 bienso: req.body.bienso,
             }
-            if (!userReq.bienso)
+            if (userReq.bienso)
             {
-                let allReceipts = await Receipts.findAll({raw: true, nest: true})
-                let prcReceipts = allReceipts.map(receipt=>
+                let {count, rows} = await Receipts.findAndCountAll({
+                    attributes:["Date", "Amount", "CarID"],
+                    include: [{
+                        model: Car,
+                        attributes: ["LicensePlate"],
+                        where:{
+                           id: sequelize.col('RECEIPTS.CarID'),
+                           LicensePlate: userReq.bienso
+                        },
+                        include:{
+                            model: Customer,
+                            attributes: ["Name"],
+                            where:{
+                                id: sequelize.col('CAR.CustomerID')
+                            }
+                        }
+                    }]
+                })
+                /*let prcReceipts = allReceipts.map(receipt=>
                     {
                         delete receipt["createdAt"]
                         delete receipt["updatedAt"]
                         return receipt
-                    })
-                res.json(prcReceipts)
-                return
-            }
-            else{
-                let allCar= await Car.findOne({
-                    where: {LicensePlate: userReq.bienso}})
-                let allReceipts=await Receipts.findAll({
-                    where: {CarID: allCar["id"]},raw: true, nest: true})
-                let procReceipts = allReceipts.map(receipt=>{
-                    delete receipt["createdAt"]
-                    delete receipt["updatedAt"]
-                    return receipt
+                    })*/
+                res.json({
+                    Total: count,
+                    Receipts: rows
                 })
-                res.json(procReceipts)
-                return
+                return 
             }
-
         }
         catch(err)
         {
@@ -51,16 +86,16 @@ const collectmoneyController =
             }
             console.log(userReq)
             if (!userReq.bienso || !userReq.sotien) {
-                res.json("Did not enter amount or license plate")
+                res.status(400).json("Did not enter amount or license plate")
                 return
             }
             let allCar = await Car.findOne({ where: { LicensePlate: userReq.bienso } })
             if (!allCar) {
-                res.json("Couldn't find license plate")
+                res.status(400).json("Couldn't find license plate")
                 return
             }
             if (userReq.sotien > allCar['Debt']) {
-                res.json("The payment amount is greater than the amount owed")
+                res.status(400).json("The payment amount is greater than the amount owed")
                 return
             }
             let newReceipts = await Receipts.create({
@@ -87,7 +122,7 @@ const collectmoneyController =
 
         }
         catch (err) {
-            console.error(err)
+            return res.status(400).json(err)
         }
     }
 }
