@@ -43,7 +43,7 @@ var database = {
         migration: async () => {
             try{
                 association();
-                await sequelize.sync({force:false})
+                await sequelize.sync({force:true})
 
             }catch(err){
                 console.log(err)
